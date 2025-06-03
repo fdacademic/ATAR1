@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>פרטי קורס</title>
+  <style>
+    body {
+      font-family: 'Assistant', sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+    img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #1f2d3d;
+    }
+    p {
+      line-height: 1.8;
+    }
+    .info {
+      margin: 15px 0;
+    }
+    form {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    input, textarea {
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #b79d65;
+      color: white;
+      padding: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+    button:hover {
+      background-color: #a78a52;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="course-detail">
+    <p>טוען פרטי קורס...</p>
+  </div>
+
+  <script>
+    async function loadCourse() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('slug');
+      const container = document.getElementById('course-detail');
+
+      try {
+        const response = await fetch('courses.json');
+        const courses = await response.json();
+        const course = courses.find(c => c.slug === slug);
+
+        if (!course) {
+          container.innerHTML = '<p>הקורס לא נמצא.</p>';
+          return;
+        }
+
+        const image = course.image && course.image.trim() !== '' ? course.image : 'LOGO_DF_NEW.png';
+
+        container.innerHTML = `
+          <h1>${course.title}</h1>
+          <img src="${image}" alt="${course.title}" />
+          <p class="info"><strong>תיאור:</strong> ${course.description}</p>
+          <p class="info"><strong>שעות לימוד:</strong> ${course.hours}</p>
+          <p class="info"><strong>צורת הלימוד:</strong> ${course.method}</p>
+          <p class="info"><strong>עלות:</strong> ${course.price}</p>
+          <h2>טופס יצירת קשר לקורס</h2>
+          <form action="mailto:FDACADEMIC@gmail.com" method="POST" enctype="text/plain">
+            <input type="text" name="שם" placeholder="שם מלא" required />
+            <input type="email" name="אימייל" placeholder="אימייל" required />
+            <input type="tel" name="טלפון" placeholder="טלפון" />
+            <textarea name="הודעה" rows="4">שלום, אני מעוניין/ת בקורס ${course.title}. נא צרו איתי קשר עם פרטים נוספים.</textarea>
+            <button type="submit">שלח פנייה</button>
+          </form>
+        `;
+      } catch (error) {
+        container.innerHTML = '<p>אירעה שגיאה בטעינת הנתונים.</p>';
+      }
+    }
+
+    loadCourse();
+  </script>
+</body>
+</html>
